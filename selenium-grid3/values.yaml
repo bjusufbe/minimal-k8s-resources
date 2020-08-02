@@ -1,0 +1,66 @@
+# Default values for testing infrastructure.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+hub:
+  serviceName: selenium-hub
+  service:
+    type: NodePort
+    nodePort: 31500
+  deploymentName: selenium-hub
+  rollingUpdate:
+    maxSurge: 1 # max number of pods that can be created over the desired number of pods
+    maxUnavailable: 0 # max number of pods that can be unavailable during rolling update
+  repository: selenium/hub:3.141.59
+  pullPolicy: IfNotPresent
+  replicaCount: 1
+  environmentVariables:
+    gridBrowserTimeout: "200" # this value represents how long should the Grid wait before it treats a particular test session as stale (maybe due to some issue with browser itself like browser crash)
+    gridTimeout: "10" # max. amount of time that hub will keep specific node occupied after session is completed before giving next request in the queue ability to be executed on that specific node
+  resources:
+    requests:
+      memory: "200Mi"
+      cpu: "200m"
+    limits:
+      memory: "400Mi"
+      cpu: "400m"
+
+chrome:
+  serviceName: node-chrome
+  service:
+    type: NodePort
+    nodePort: 31501
+  deploymentName: node-chrome
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+  repository: selenium/node-chrome-debug:3.141.59
+  pullPolicy: IfNotPresent
+  replicaCount: 1
+  resources:
+    requests:
+      memory: "500Mi"
+      cpu: "200m"
+    limits:
+      memory: "1300Mi"
+      cpu: "800m"
+
+firefox:
+  serviceName: node-firefox
+  service:
+    type: NodePort
+    nodePort: 31502
+  deploymentName: node-firefox
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+  repository: selenium/node-firefox-debug:3.141.59
+  pullPolicy: IfNotPresent
+  replicaCount: 1
+  resources:
+    requests:
+      memory: "400Mi"
+      cpu: "200m"
+    limits:
+      memory: "1300Mi"
+      cpu: "800m"
