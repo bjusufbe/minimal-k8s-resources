@@ -3,7 +3,7 @@
 ## What it is?
 
 This is a Helm 3 chart which is used for setup/deployment of Selenium Grid 3 (Hub + Chrome/Firefox nodes) on Kubernetes environment.
-Kubernetes, as an environment, is ideal place to deploy Selenium Grid since we can harness full power of distributed cluster which gives us ability to scale number of nodes in Selenium Grid very easily. This Helm chart makes it even easier to do the setup of needed resources and having Selenium Grid infrastructure up and running in a few moments.
+Kubernetes, as an environment, is ideal place to deploy Selenium Grid since we can harness full power of distributed cluster which gives us ability to scale number of nodes in Selenium Grid (accross the cluster) very easily based on the expected load. This Helm chart makes it even easier to do the setup of needed resources and have Selenium Grid infrastructure up and running in a few moments.
 
 ## How to use it?
 
