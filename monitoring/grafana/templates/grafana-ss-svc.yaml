@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.grafana.serviceName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.grafana.appLabel }}
+    appVersion: {{ .Chart.AppVersion | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: {{ .Release.Name }}
+spec:
+  type: NodePort
+  ports:
+  - name: grafana
+    port: 3000
+    targetPort: 3000
+    {{ if eq .Values.grafana.service.type "NodePort" }}nodePort: {{ .Values.grafana.service.nodePort }}{{ end }}
+  selector:
+    app: {{ .Values.grafana.appLabel }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.grafana.statefulSetName }}
+  labels:
+    app: {{ .Values.grafana.appLabel }}
+    appVersion: {{ .Chart.AppVersion | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.grafana.appLabel }}
+  serviceName: {{ .Values.grafana.serviceName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.grafana.appLabel }}
+    spec:
+      containers:
+      - name: grafana-core
+        image: {{ .Values.grafana.repository }}
+        imagePullPolicy: {{ .Values.grafana.pullPolicy }}
+        resources:
+          {{- toYaml .Values.grafana.resources | nindent 10 }}
+        env:
+        - name: GF_AUTH_BASIC_ENABLED
+          value: {{ .Values.grafana.security.authBasicEnabled | quote }}
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: {{ .Values.grafana.security.authAnonymousEnabled | quote }}
+        - name: GF_SECURITY_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.grafana.security.secretName }}
+              key: username
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.grafana.security.secretName }}
+              key: password
+        volumeMounts:
+        - name: {{ .Values.grafana.persistence.volumeName }}
+          mountPath: /var/lib/grafana
+        - name: grafana-ini
+          mountPath: /etc/grafana/grafana.ini
+          subPath: grafana.ini
+        {{- if eq .Values.grafana.provisioning.datasource.enabled "true" }}
+        - name: datasource
+          mountPath: /etc/grafana/provisioning/datasources
+        {{- end}}
+        {{- if eq .Values.grafana.provisioning.dashboard.enabled "true" }}
+        - name: dashboard
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: specific-dashboard
+          mountPath: /dashboards
+        {{- end}}
+      volumes:
+      - name: grafana-ini
+        configMap:
+          name: {{ .Values.grafana.configMapName }}
+      {{- if eq .Values.grafana.provisioning.datasource.enabled "true" }}
+      - name: datasource
+        configMap:
+          name: {{ .Values.grafana.provisioning.datasource.configMapDataSourceName }}
+      {{- end}}
+      {{- if eq .Values.grafana.provisioning.dashboard.enabled "true" }}
+      - name: dashboard
+        configMap:
+          name: {{ .Values.grafana.provisioning.dashboard.configMapDashboardName }}
+      - name: specific-dashboard
+        configMap:
+          name: {{ .Values.grafana.provisioning.dashboard.configMapSpecificDashboardName }}
+      {{- end}}
+      {{- if not .Values.grafana.persistence.enabled }}
+      - name: {{ .Values.grafana.persistence.volumeName }}
+        emptyDir: {}
+      {{- end}}
+  {{- if .Values.grafana.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .Values.grafana.persistence.volumeName }}
+    spec:
+      accessModes: {{ .Values.grafana.persistence.accessModes }}
+      storageClassName: {{ .Values.grafana.persistence.storageClassName }}
+      resources:
+        requests:
+          storage: {{ .Values.grafana.persistence.requestStorage }}
+  {{- end }}

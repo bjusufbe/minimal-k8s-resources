@@ -1,6 +1,4 @@
 # Default values for testing infrastructure.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
 hub:
   serviceName: selenium-hub

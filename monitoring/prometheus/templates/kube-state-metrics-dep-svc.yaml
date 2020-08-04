@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.kubeStateMetrics.serviceName }}
+  namespace: {{ .Values.kubeStateMetrics.namespace }}
+  labels:
+    app: {{ .Values.kubeStateMetrics.appLabel }}
+    appVersion: {{ .Chart.AppVersion | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: {{ .Release.Name }}
+  annotations:
+    prometheus.io/scrape: 'true'
+spec:
+  ports:
+  - name: http-metrics
+    port: 8080
+    targetPort: http-metrics
+    protocol: TCP
+  - name: telemetry
+    port: 8081
+    targetPort: telemetry
+    protocol: TCP
+  selector:
+    app: {{ .Values.kubeStateMetrics.appLabel }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.kubeStateMetrics.appLabel }}
+    appVersion: {{ .Chart.AppVersion | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: {{ .Release.Name }}
+  name: {{ .Values.kubeStateMetrics.deploymentName }}
+  namespace: {{ .Values.kubeStateMetrics.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.kubeStateMetrics.appLabel }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      {{- toYaml .Values.kubeStateMetrics.rollingUpdate | nindent 6 }}
+  replicas: {{ .Values.kubeStateMetrics.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.kubeStateMetrics.appLabel }}
+    spec:
+      serviceAccountName: {{ .Values.kubeStateMetrics.rbac.serviceAccountName }}
+      containers:
+      - name: kube-state-metrics
+        image: {{ .Values.kubeStateMetrics.repository }}
+        imagePullPolicy: {{ .Values.kubeStateMetrics.pullPolicy }}
+        resources:
+          {{- toYaml .Values.kubeStateMetrics.resources | nindent 10 }}
+        ports:
+        - name: http-metrics
+          containerPort: 8080
+        - name: telemetry
+          containerPort: 8081
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          timeoutSeconds: 5

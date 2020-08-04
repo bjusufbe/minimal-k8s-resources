@@ -1,0 +1,69 @@
+# Default values for Prometheus and its additional metric scrapers (kube-state-metrics, node-exporter).
+
+prometheus:
+  serviceName: prometheus
+  service:
+    type: NodePort
+    nodePort: 32000
+  statefulSetName: prometheus
+  appLabel: prometheus
+  repository: prom/prometheus:v2.20.0
+  pullPolicy: IfNotPresent
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 200m
+      memory: 200Mi
+    limits:
+      cpu: 600m
+      memory: 1000Mi
+  configMapName: prometheus
+  rbac:
+    serviceAccountName: prometheus
+    clusterRole: prometheus
+    clusterRoleBinding: prometheus
+  persistence:
+    #enabled: "true" # Comment this line if you don't care about the persistence
+    volumeName: prometheus-volume
+    storageClassName: gp2
+    accessModes:
+    - ReadWriteOnce
+    requestStorage: 10Gi
+
+nodeExporter:
+  namespace: kube-system
+  serviceName: node-exporter
+  daemonSetName: node-exporter
+  appLabel: node-exporter
+  repository: prom/node-exporter:v1.0.1
+  pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 10m
+      memory: 50Mi
+    requests:
+      cpu: 10m
+      memory: 50Mi
+
+kubeStateMetrics:
+  namespace: kube-system
+  rbac:
+    serviceAccountName: kube-state-metrics
+    clusterRole: kube-state-metrics
+    clusterRoleBinding: kube-state-metrics
+  serviceName: kube-state-metrics
+  deploymentName: kube-state-metrics
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+  appLabel: kube-state-metrics
+  repository: quay.io/coreos/kube-state-metrics:v1.9.7
+  pullPolicy: IfNotPresent
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 50Mi
+    limits:
+      cpu: 200m
+      memory: 200Mi

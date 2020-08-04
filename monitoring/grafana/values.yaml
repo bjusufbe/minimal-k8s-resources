@@ -1,0 +1,43 @@
+# Default values for Grafana.
+
+grafana:
+  serviceName: grafana
+  service:
+    type: NodePort
+    nodePort: 32001
+  statefulSetName: grafana
+  repository: grafana/grafana:7.1.1
+  pullPolicy: IfNotPresent
+  replicaCount: 1
+  configMapName: grafana-ini
+  appLabel: grafana
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 300m
+      memory: 300Mi
+  security:
+    secretName: grafana
+    secret:
+      username: admin # Must be passed (preferably inline rather than declaratevely) with helm install command
+      password: admin # Must be passed (preferably inline rather than declaratevely) with helm install command
+    authBasicEnabled: "true"
+    authAnonymousEnabled: "false"
+  persistence:
+    #enabled: "true" # Comment this line if you don't care about the persistence
+    volumeName: grafana-volume
+    storageClassName: gp2
+    accessModes:
+    - ReadWriteOnce
+    requestStorage: 5Gi
+  provisioning:
+    dashboard: 
+      enabled: "true" # if true, cpu-memory-dashboard will be provisioned
+      configMapDashboardName: grafana-prometheus-dashboard
+      configMapSpecificDashboardName: resource-utilisation
+    datasource: 
+      enabled: "true" # if true, prometheus datasource will be added
+      prometheusUrl: http://prometheus:9090
+      configMapDataSourceName: grafana-prometheus-datasource

@@ -55,4 +55,4 @@ To check all available options that are configurable, you can use following comm
 ```
 helm show values .
 ```
-or simply check `values.yaml` file
+or simply check `values.yaml` file.
