@@ -5,7 +5,8 @@
 This is a Helm 3 chart which is used for setup/deployment of Grafana, connecting to the datasource (Prometheus) and provisioning example Grafana dashboard which gives you important information about cpu/memory (limit/request/used) ratio's per each pod on the cluster out of the box, which can be very useful for fine tunning the performances of the your workload on k8s cluster.
 
 This is an example of such simple Grafana dashboard:
-![](https://github.com/bjusufbe/minimal-k8s-resources/tree/master/monitoring/grafana/img/grafana-dashboard.png)
+
+![](https://github.com/bjusufbe/minimal-k8s-resources/blob/master/monitoring/grafana/img/grafana-dashboard.png)
 
 ## How to use it?
 
