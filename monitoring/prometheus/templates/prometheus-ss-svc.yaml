@@ -11,7 +11,7 @@ metadata:
 spec:
   selector:
     app: {{ .Values.prometheus.appLabel }}
-  type: NodePort
+  type: {{ .Values.prometheus.service.type }}
   ports:
   - name: web
     {{ if eq .Values.prometheus.service.type "NodePort" }}nodePort: {{ .Values.prometheus.service.nodePort }}{{ end }}
