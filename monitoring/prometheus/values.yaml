@@ -30,7 +30,7 @@ prometheus:
     - ReadWriteOnce
     requestStorage: 10Gi
   ingress:
-    enabled: "true" # if true, prometheus will be exposed to the outside by using ingress
+    enabled: "false" # if true, prometheus will be exposed to the outside by using ingress
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-issuer
       kubernetes.io/ingress.class: nginx
