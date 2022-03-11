@@ -33,7 +33,7 @@ $ kubectl get svc grafana -n bakir
 NAME      TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
 grafana   NodePort   10.96.119.252   <none>        3000:32001/TCP   73m
 ```
-and try to access it with IP addresss of one of the kubernetes cluster nodes. For example: `http://192.168.64.3:32001/`
+and try to access it with IP address of one of the kubernetes cluster nodes. For example: `http://192.168.64.3:32001/`
 
 Finally, connect with credentials that you set in `values.yaml` and you will be able to see that:
 1. Datasource Prometheus is already added

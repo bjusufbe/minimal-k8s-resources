@@ -1,0 +1,16 @@
+{{- if .Values.prometheus.basicAuth.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.prometheus.basicAuth.configMapName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.prometheus.appLabel }}
+    appVersion: {{ .Chart.AppVersion | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: {{ .Release.Name }}
+data:
+  web.yml: |-
+    basic_auth_users:
+        admin: {{ .Values.prometheus.basicAuth.password }}
+{{- end}}

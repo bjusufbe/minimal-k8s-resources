@@ -11,10 +11,6 @@ metadata:
 data:
   resource-optimisation.json: |-
     {
-      "timezone": "",
-      "title": "CPU & Memory optimisation per pod",
-      "uid": "9SvnnmnGz",
-      "version": 1,
       "annotations": {
         "list": [
           {
@@ -31,7 +27,7 @@ data:
       "editable": true,
       "gnetId": null,
       "graphTooltip": 0,
-      "iteration": 1596543135053,
+      "iteration": 1646840212066,
       "links": [],
       "panels": [
         {
@@ -197,7 +193,7 @@ data:
               "refId": "B"
             },
             {
-              "expr": "sum (container_memory_working_set_bytes{namespace=\"${namespace}\", pod=\"${pod_name}\"}) by (pod)",
+              "expr": "sum(container_memory_working_set_bytes{namespace=\"${namespace}\", pod=\"${pod_name}\", image!=\"\", container_name!=\"POD\"})",
               "interval": "",
               "legendFormat": "memory-used",
               "refId": "C"
@@ -213,6 +209,7 @@ data:
             "sort": 0,
             "value_type": "individual"
           },
+          "transformations": [],
           "type": "graph",
           "xaxis": {
             "buckets": null,
@@ -245,6 +242,7 @@ data:
           }
         }
       ],
+      "refresh": false,
       "schemaVersion": 26,
       "style": "dark",
       "tags": [],
@@ -254,11 +252,11 @@ data:
             "allValue": null,
             "current": {
               "selected": true,
-              "text": "default",
-              "value": "default"
+              "text": "dev",
+              "value": "dev"
             },
             "datasource": "Prometheus",
-            "definition": "",
+            "definition": "label_values(kube_namespace_created, namespace)",
             "hide": 0,
             "includeAll": false,
             "label": null,
@@ -279,9 +277,9 @@ data:
           {
             "allValue": null,
             "current": {
-              "selected": true,
-              "text": "grafana-0",
-              "value": "grafana-0"
+              "selected": false,
+              "text": "dev-logisticsmt-monolith-6ddd884cb-fctlw",
+              "value": "dev-logisticsmt-monolith-6ddd884cb-fctlw"
             },
             "datasource": "Prometheus",
             "definition": "",
@@ -305,12 +303,11 @@ data:
         ]
       },
       "time": {
-        "from": "now-15m",
+        "from": "now-1h",
         "to": "now"
       },
       "timepicker": {
         "refresh_intervals": [
-          "5s",
           "10s",
           "30s",
           "1m",
@@ -332,5 +329,9 @@ data:
           "7d",
           "30d"
         ]
-      }
+      },
+      "timezone": "",
+      "title": "CPU & Memory optimisation per pod",
+      "uid": "9SvnnmnGz",
+      "version": 1
     }

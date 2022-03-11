@@ -1,0 +1,38 @@
+{{- if .Values.prometheus.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "prometheus.fullname" . }}
+  labels:
+{{ include "prometheus.labels" . | indent 4 }}
+  {{- with .Values.prometheus.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+{{- if .Values.prometheus.ingress.tls }}
+  tls:
+  {{- range .Values.prometheus.ingress.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ . | quote }}
+      {{- end }}
+      secretName: {{ .secretName }}
+  {{- end }}
+{{- end }}
+  rules:
+  {{- range .Values.prometheus.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+        {{- range .paths }}
+          - path: {{ . }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $.Values.prometheus.serviceName }}
+                port:
+                  number: 9090
+        {{- end }}
+  {{- end }}
+{{- end }}

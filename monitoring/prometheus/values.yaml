@@ -7,7 +7,7 @@ prometheus:
     nodePort: 32000
   statefulSetName: prometheus
   appLabel: prometheus
-  repository: prom/prometheus:v2.20.0
+  repository: prom/prometheus:v2.33.5
   pullPolicy: IfNotPresent
   replicaCount: 1
   resources:
@@ -22,6 +22,12 @@ prometheus:
     serviceAccountName: prometheus
     clusterRole: prometheus
     clusterRoleBinding: prometheus
+  basicAuth:
+    enabled: true
+    configMapName: prometheus-basic-auth
+    password: $2a$12$5oelBjrYQ.WKIbURUryaTOBZNk6ymgbGWRGVQvN.0RYThT97rmxA. # change this password with bcrypt hash value of your choice
+  enableFeature:
+    remoteWriteReceiver: true
   persistence:
     #enabled: "true" # Comment this line if you don't care about the persistence
     volumeName: prometheus-volume
@@ -29,6 +35,19 @@ prometheus:
     accessModes:
     - ReadWriteOnce
     requestStorage: 10Gi
+  ingress:
+    enabled: "false" # if true, prometheus will be exposed to the outside by using ingress
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-issuer
+      kubernetes.io/ingress.class: nginx
+    hosts:
+      - host: prometheus.example.com
+        paths:
+          - "/"
+    tls:
+    - secretName: tls-prometheus
+      hosts:
+        - prometheus.example.com
 
 nodeExporter:
   namespace: kube-system

@@ -33,7 +33,7 @@ $ kubectl get svc prometheus -n <NAMESPACE>
 NAME         TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
 prometheus   NodePort   10.111.234.69   <none>        9090:32000/TCP   18m
 ```
-and try to access it with IP addresss of one of the kubernetes cluster nodes. For example: `http://192.168.64.3:32000/graph`
+and try to access it with IP address of one of the kubernetes cluster nodes. For example: `http://192.168.64.3:32000/graph`
 
 Finally, verify that all metrics scrappers are available and running on the following path: `/targets`
 

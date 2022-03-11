@@ -55,6 +55,12 @@ spec:
           {{- toYaml .Values.prometheus.resources | nindent 10 }}
         args:
         - --config.file=/etc/prometheus/prometheus.yml
+        {{- if .Values.prometheus.basicAuth.enabled }}
+        - --web.config.file=/tmp/web.yml
+        {{- end}}
+        {{- if .Values.prometheus.enableFeature.remoteWriteReceiver }}
+        - --enable-feature=remote-write-receiver
+        {{- end}}
         ports:
         - name: web
           containerPort: 9090
@@ -63,10 +69,20 @@ spec:
           mountPath: /prometheus
         - name: prometheus-config
           mountPath: /etc/prometheus
+        {{- if .Values.prometheus.basicAuth.enabled }}
+        - name: prometheus-basic-auth
+          mountPath: /tmp/web.yml
+          subPath: web.yml
+        {{- end}}
       volumes:
       - name: prometheus-config
         configMap:
           name: {{ .Values.prometheus.configMapName }}
+      {{- if .Values.prometheus.basicAuth.enabled }}
+      - name: prometheus-basic-auth
+        configMap:
+          name: {{ .Values.prometheus.basicAuth.configMapName }}
+      {{- end}}
       {{- if not .Values.prometheus.persistence.enabled }}
       - name: {{ .Values.prometheus.persistence.volumeName }}
         emptyDir: {}
