@@ -38,6 +38,10 @@ spec:
       labels:
         app: {{ .Values.grafana.appLabel }}
     spec:
+      securityContext:
+        runAsUser: 472
+        runAsGroup: 472
+        fsGroup: 472
       containers:
       - name: grafana-core
         image: {{ .Values.grafana.repository }}
