@@ -86,3 +86,25 @@ kubeStateMetrics:
     limits:
       cpu: 200m
       memory: 200Mi
+
+postgresExporter:
+  enabled: true
+  namespace: prometheus-grafana # or any namespace
+  serviceName: psql-metrics
+  deploymentName: psql-metrics
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+  appLabel: psql-metrics
+  repository: prometheuscommunity/postgres-exporter:v0.10.0 # v0.10.0 used since in later versions PG_EXPORTER_EXCLUDE_DATABASES does not work properly
+  pullPolicy: IfNotPresent
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 50Mi
+    limits:
+      cpu: 200m
+      memory: 200Mi
+  env:
+    DATA_SOURCE_NAME: "postgresql://postgres:postgrespassword@postgres:5432/database?sslmode=require" # should be modified with you psql data
