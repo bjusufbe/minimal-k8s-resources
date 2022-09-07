@@ -88,7 +88,7 @@ kubeStateMetrics:
       memory: 200Mi
 
 postgresExporter:
-  enabled: true
+  enabled: false
   namespace: prometheus-grafana # or any namespace
   serviceName: psql-metrics
   deploymentName: psql-metrics
