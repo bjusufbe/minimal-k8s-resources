@@ -25,10 +25,12 @@ data:
     - job_name: node
       static_configs:
       - targets: ['{{ .Values.nodeExporter.serviceName }}.{{ .Values.nodeExporter.namespace }}:9200']
-
+    
+    {{- if .Values.postgresExporter.enabled }}
     - job_name: postgres-exporter
       static_configs:
         - targets: ['{{ .Values.postgresExporter.serviceName }}.{{ .Values.postgresExporter.namespace }}:9187']
+    {{- end }}
 
     - job_name: 'kubernetes-cadvisor'
       scheme: https

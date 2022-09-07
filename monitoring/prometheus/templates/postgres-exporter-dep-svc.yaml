@@ -58,4 +58,4 @@ spec:
         ports:
         - name: psql-metrics
           containerPort: 9187
-{{- end}}
+{{- end }}
