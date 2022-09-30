@@ -1,0 +1,61 @@
+{{- if .Values.postgresExporter.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.postgresExporter.serviceName }}
+  namespace: {{ .Values.postgresExporter.namespace }}
+  labels:
+    app: {{ .Values.postgresExporter.appLabel }}
+    appVersion: {{ .Chart.AppVersion | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: {{ .Release.Name }}
+  annotations:
+    prometheus.io/scrape: 'true'
+spec:
+  ports:
+  - name: psql-metrics
+    port: 9187
+    targetPort: psql-metrics
+    protocol: TCP
+  selector:
+    app: {{ .Values.postgresExporter.appLabel }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.postgresExporter.appLabel }}
+    appVersion: {{ .Chart.AppVersion | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: {{ .Release.Name }}
+  name: {{ .Values.postgresExporter.deploymentName }}
+  namespace: {{ .Values.postgresExporter.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.postgresExporter.appLabel }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      {{- toYaml .Values.postgresExporter.rollingUpdate | nindent 6 }}
+  replicas: {{ .Values.postgresExporter.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.postgresExporter.appLabel }}
+    spec:
+      containers:
+      - name: psql-metrics
+        image: {{ .Values.postgresExporter.repository }}
+        imagePullPolicy: {{ .Values.postgresExporter.pullPolicy }}
+        resources:
+          {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
+        env:
+        {{- range $key, $value := .Values.postgresExporter.env }}
+        - name: {{ $key | quote }}
+          value: {{ tpl $value $ | quote }}
+        {{- end }}
+        ports:
+        - name: psql-metrics
+          containerPort: 9187
+{{- end }}
